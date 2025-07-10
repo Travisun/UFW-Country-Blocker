@@ -36,6 +36,7 @@ load_config() {
     if [ -f "$CONFIG_FILE" ]; then
         log "加载配置文件: $CONFIG_FILE"
         source "$CONFIG_FILE"
+        log "配置文件加载完成"
     else
         log "配置文件不存在，使用默认配置: $CONFIG_FILE"
     fi
@@ -131,8 +132,12 @@ download_and_merge_cidr_lists() {
         temp_files+=("${TEMP_DIR}/cidr_${i}.txt")
     done
     
+    log "临时文件列表: ${temp_files[*]}"
+    
     # 下载所有列表
     for i in "${!urls[@]}"; do
+        log "处理第 $((i+1)) 个URL: ${urls[$i]}"
+        log "对应的临时文件: ${temp_files[$i]}"
         if download_cidr_list "${urls[$i]}" "${temp_files[$i]}"; then
             # 合并到主文件
             cat "${temp_files[$i]}" >> "$merged_file"
