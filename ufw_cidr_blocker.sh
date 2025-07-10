@@ -22,8 +22,8 @@ RETRY_DELAY=5
 DEBUG_MODE=false
 
 # 默认CIDR列表URL
-IPV4_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ae_ipv4.txt")
-IPV6_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ae_ipv6.txt")
+IPV4_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/cn_ipv4.txt")
+IPV6_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/cn_ipv6.txt")
 
 # 默认防火墙规则配置
 BLOCK_PORTS=("53")
