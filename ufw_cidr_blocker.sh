@@ -118,9 +118,13 @@ download_cidr_list() {
 
 # 下载多个CIDR列表并合并
 download_and_merge_cidr_lists() {
-    local urls=("$@")
     local merged_file="$1"
+    shift  # 移除第一个参数（文件名），剩下的都是URL
+    local urls=("$@")
     local temp_files=()
+    
+    log "合并文件: $merged_file"
+    log "URL列表: ${urls[*]}"
     
     # 创建临时文件列表
     for i in "${!urls[@]}"; do
@@ -275,6 +279,7 @@ main() {
     if [ ${#IPV4_URLS[@]} -gt 0 ]; then
         local ipv4_file="$TEMP_DIR/ipv4_cidr.txt"
         touch "$ipv4_file"
+        log "开始处理IPv4 URL列表: ${IPV4_URLS[*]}"
         download_and_merge_cidr_lists "$ipv4_file" "${IPV4_URLS[@]}"
         if [ -s "$ipv4_file" ]; then
             add_new_rules "$ipv4_file"
@@ -287,6 +292,7 @@ main() {
     if [ ${#IPV6_URLS[@]} -gt 0 ]; then
         local ipv6_file="$TEMP_DIR/ipv6_cidr.txt"
         touch "$ipv6_file"
+        log "开始处理IPv6 URL列表: ${IPV6_URLS[*]}"
         download_and_merge_cidr_lists "$ipv6_file" "${IPV6_URLS[@]}"
         if [ -s "$ipv6_file" ]; then
             add_new_rules "$ipv6_file"
