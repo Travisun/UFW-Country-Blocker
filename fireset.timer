@@ -1,0 +1,15 @@
+[Unit]
+Description=Fireset - IP Set Management Timer
+Requires=fireset.service
+
+[Timer]
+Unit=fireset.service
+# 每天凌晨 3 点运行
+OnCalendar=*-*-* 03:00:00
+# 如果错过运行时间（比如系统关机），系统启动后 15 分钟运行
+OnBootSec=15min
+# 随机延迟启动时间，避免大量服务器同时访问 IP 列表
+RandomizedDelaySec=30min
+
+[Install]
+WantedBy=timers.target 
