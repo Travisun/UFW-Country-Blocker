@@ -1,135 +1,58 @@
-# UFW Country Blocker
+# UFW CIDR Blocker
 
-一个基于UFW防火墙的自动化国家/地区IP阻止工具，支持IPv4和IPv6 CIDR列表，可自动更新防火墙规则以阻止特定国家或地区的网络访问。
-
-## 🚀 一键安装
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install.sh | sudo bash
-```
+一个基于UFW防火墙的CIDR列表自动阻止工具，支持IPv4和IPv6 CIDR列表，可以自动下载并应用国家/地区的IP地址段到防火墙规则中。
 
 ## 功能特性
 
-- 🔒 **自动CIDR列表更新**: 从GitHub等源自动下载最新的国家/地区IP列表
-- 🌐 **IPv4/IPv6支持**: 同时支持IPv4和IPv6地址段阻止
-- 🛡️ **多端口阻止**: 可配置阻止多个端口（默认阻止DNS端口53）
-- 📊 **协议控制**: 支持TCP、UDP协议阻止
-- 🚫 **ICMP阻止**: 可阻止ping请求（IPv4和IPv6）
-- ⏰ **定时任务**: 支持cron定时自动更新规则
-- 📝 **完整日志**: 详细的操作日志记录
-- 🔄 **规则管理**: 自动清理旧规则并应用新规则
-- ⚙️ **灵活配置**: 通过配置文件自定义所有行为
+- 🔥 **自动下载CIDR列表**：支持从GitHub等源自动下载最新的CIDR列表
+- 🌍 **多国家支持**：默认支持中国IP列表，可轻松扩展到其他国家
+- 🔒 **UFW集成**：完全集成到UFW防火墙系统中
+- 📊 **IPv4/IPv6支持**：同时支持IPv4和IPv6地址段
+- ⚡ **高性能**：优化的脚本性能，支持大量CIDR规则
+- 🔄 **自动更新**：支持systemd定时器自动更新规则
+- 📝 **详细日志**：完整的操作日志记录
+- 🛡️ **安全可靠**：包含错误处理和回滚机制
 
 ## 系统要求
 
-- Ubuntu/Debian系统
-- UFW防火墙已启用
+- Linux系统（推荐Ubuntu/Debian）
+- UFW防火墙
+- curl工具
 - root权限
-- curl（用于下载CIDR列表）
-- cron（用于定时任务）
 
-## 快速开始
+## 快速安装
 
-### 方法一：一键安装（推荐）
+### 方法一：使用安装脚本（推荐）
 
 ```bash
-# 下载并运行一键安装脚本
-curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install.sh | sudo bash
-```
-
-或者：
-
-```bash
-# 下载安装脚本
-wget https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install.sh
+# 下载项目
+git clone https://github.com/your-repo/ufw-cidr-blocker.git
+cd ufw-cidr-blocker
 
 # 运行安装脚本
 sudo bash install.sh
 ```
 
-一键安装脚本将自动：
-- 从GitHub下载最新版本的文件
-- 检查并安装系统依赖（UFW、curl、cron）
-- 安装主程序到 `/usr/local/bin/`
-- 创建日志文件
-- 启用并配置UFW防火墙
-- 设置每周星期一早上3点自动更新的定时任务
-- 提供完整的安装后使用说明
-
 ### 方法二：手动安装
 
-如果您想手动安装，请确保您有以下文件：
-- `install_ufw_blocker.sh` - 安装脚本
-- `ufw_cidr_blocker.sh` - 主程序脚本
-- `ufw_cidr_blocker.conf` - 配置文件
-
-然后运行：
-
 ```bash
-sudo chmod +x install_ufw_blocker.sh
-sudo ./install_ufw_blocker.sh
-```
+# 1. 复制主脚本
+sudo cp ufw_cidr_blocker.sh /usr/local/bin/ufw_cidr_blocker
+sudo chmod +x /usr/local/bin/ufw_cidr_blocker
 
-### 配置阻止目标
+# 2. 复制配置文件
+sudo cp ufw_cidr_blocker.conf /usr/local/bin/ufw_cidr_blocker.conf
 
-安装完成后，编辑配置文件：
+# 3. 创建日志文件
+sudo touch /var/log/ufw_cidr_blocker.log
+sudo chmod 644 /var/log/ufw_cidr_blocker.log
 
-```bash
-sudo nano /usr/local/bin/ufw_cidr_blocker.conf
-```
-
-## 配置说明
-
-### 基本配置
-
-```bash
-# CIDR列表URL配置
-IPV4_URLS=(
-    "https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ae_ipv4.txt"
-    # 添加更多IPv4列表
-)
-
-IPV6_URLS=(
-    "https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ae_ipv6.txt"
-    # 添加更多IPv6列表
-)
-```
-
-### 防火墙规则配置
-
-```bash
-# 要阻止的端口列表
-BLOCK_PORTS=(
-    "53"    # DNS端口
-    "80"    # HTTP端口
-    "443"   # HTTPS端口
-)
-
-# 要阻止的协议
-BLOCK_PROTOCOLS=(
-    "tcp"   # TCP协议
-    "udp"   # UDP协议
-)
-
-# 是否阻止ICMP (ping)
-BLOCK_ICMP=true
-BLOCK_IPV6_ICMP=true
-```
-
-### 高级配置
-
-```bash
-# 日志配置
-LOG_LEVEL="INFO"  # DEBUG, INFO, WARN, ERROR
-LOG_FILE="/var/log/ufw_cidr_blocker.log"
-
-# 网络超时和重试
-DOWNLOAD_TIMEOUT=30
-MAX_RETRIES=3
-RETRY_DELAY=5
-
-# 调试模式
-DEBUG_MODE=false
+# 4. 安装systemd服务（可选）
+sudo cp ufw_cidr_blocker.service /etc/systemd/system/
+sudo cp ufw_cidr_blocker.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable ufw_cidr_blocker.timer
+sudo systemctl start ufw_cidr_blocker.timer
 ```
 
 ## 使用方法
@@ -137,182 +60,189 @@ DEBUG_MODE=false
 ### 手动运行
 
 ```bash
-# 立即执行一次规则更新
-sudo ufw_cidr_blocker
+# 手动执行一次
+sudo /usr/local/bin/ufw_cidr_blocker
+```
 
-# 查看执行日志
+### 查看状态
+
+```bash
+# 查看定时器状态
+sudo systemctl status ufw_cidr_blocker.timer
+
+# 查看服务日志
+sudo journalctl -u ufw_cidr_blocker.service
+
+# 查看脚本日志
 sudo tail -f /var/log/ufw_cidr_blocker.log
 ```
 
-### 查看防火墙状态
+### 管理定时器
 
 ```bash
-# 查看所有UFW规则
-sudo ufw status numbered
+# 停止定时器
+sudo systemctl stop ufw_cidr_blocker.timer
 
-# 查看阻止的规则
-sudo ufw status numbered | grep AUTO_BLOCK_CIDR
+# 禁用定时器
+sudo systemctl disable ufw_cidr_blocker.timer
+
+# 重新启用定时器
+sudo systemctl enable ufw_cidr_blocker.timer
+sudo systemctl start ufw_cidr_blocker.timer
 ```
 
-### 管理定时任务
+## 配置说明
+
+编辑配置文件 `/usr/local/bin/ufw_cidr_blocker.conf`：
 
 ```bash
-# 查看当前定时任务
-sudo crontab -l
-
-# 编辑定时任务
-sudo crontab -e
-
-# 删除定时任务
-sudo crontab -r
+sudo nano /usr/local/bin/ufw_cidr_blocker.conf
 ```
 
-**默认定时任务**: 每周星期一早上3点自动更新规则
-
-## 支持的CIDR列表源
-
-项目默认使用 [Travisun/Latest-Country-IP-List](https://github.com/Travisun/Latest-Country-IP-List) 作为CIDR列表源。
-
-### 可用的国家/地区代码
-
-- `ae` - 阿联酋
-- `cn` - 中国
-- `us` - 美国
-- `ru` - 俄罗斯
-- `kr` - 韩国
-- `jp` - 日本
-- 等等...
-
-### 自定义CIDR列表
-
-您可以添加任何提供CIDR列表的URL：
+### 主要配置项
 
 ```bash
+# CIDR列表URL配置
+IPV4_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/cn_ipv4.txt")
+IPV6_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/cn_ipv6.txt")
+
+# 防火墙规则配置
+BLOCK_PORTS=("53")           # 要阻止的端口
+BLOCK_PROTOCOLS=("tcp" "udp") # 要阻止的协议
+BLOCK_ICMP=true              # 是否阻止ICMP
+BLOCK_IPV6_ICMP=true         # 是否阻止IPv6 ICMP
+
+# 测试模式配置
+TEST_MODE=false              # 测试模式开关
+TEST_CIDR_LIMIT=10           # 测试模式下的CIDR数量限制
+```
+
+### 添加其他国家
+
+要阻止其他国家的IP，只需修改URL配置：
+
+```bash
+# 例如：阻止美国IP
+IPV4_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/us_ipv4.txt")
+IPV6_URLS=("https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/us_ipv6.txt")
+
+# 阻止多个国家
 IPV4_URLS=(
-    "https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ae_ipv4.txt"
-    "https://your-custom-source.com/custom_ipv4_list.txt"
-    "https://another-source.com/blocklist.txt"
+    "https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/cn_ipv4.txt"
+    "https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ru_ipv4.txt"
 )
 ```
 
-## 日志和监控
+## 卸载
 
-### 日志文件位置
-
-- 主日志: `/var/log/ufw_cidr_blocker.log`
-- 定时任务日志: 通过cron重定向到主日志文件
-
-### 日志级别
-
-- `DEBUG` - 详细调试信息
-- `INFO` - 一般信息（默认）
-- `WARN` - 警告信息
-- `ERROR` - 错误信息
-
-### 监控示例
+### 使用卸载脚本（推荐）
 
 ```bash
-# 实时查看日志
-sudo tail -f /var/log/ufw_cidr_blocker.log
+sudo bash uninstall.sh
+```
 
-# 查看最近的错误
-sudo grep "ERROR" /var/log/ufw_cidr_blocker.log
+### 手动卸载
 
-# 查看规则更新统计
-sudo grep "添加了.*条新规则" /var/log/ufw_cidr_blocker.log
+```bash
+# 1. 停止并禁用服务
+sudo systemctl stop ufw_cidr_blocker.timer
+sudo systemctl disable ufw_cidr_blocker.timer
+
+# 2. 删除UFW规则
+sudo ufw status numbered | grep "AUTO_BLOCK_CIDR" | awk -F'[][]' '{print $2}' | sort -nr | xargs -I {} echo "y" | sudo ufw delete {}
+
+# 3. 删除文件
+sudo rm -f /usr/local/bin/ufw_cidr_blocker
+sudo rm -f /usr/local/bin/ufw_cidr_blocker.conf
+sudo rm -f /var/log/ufw_cidr_blocker.log
+sudo rm -f /var/run/ufw_cidr_blocker.lock
+sudo rm -rf /tmp/ufw_cidr_blocker
+sudo rm -f /etc/systemd/system/ufw_cidr_blocker.service
+sudo rm -f /etc/systemd/system/ufw_cidr_blocker.timer
+
+# 4. 重新加载systemd
+sudo systemctl daemon-reload
 ```
 
 ## 故障排除
 
 ### 常见问题
 
-1. **权限错误**
-   ```bash
-   # 确保以root权限运行
-   sudo ufw_cidr_blocker
-   ```
+1. **脚本无法创建规则**
+   - 检查UFW是否启用：`sudo ufw status`
+   - 检查权限：确保以root权限运行
+   - 查看详细日志：`sudo tail -f /var/log/ufw_cidr_blocker.log`
 
-2. **UFW未启用**
-   ```bash
-   # 启用UFW
-   sudo ufw enable
-   ```
+2. **下载CIDR列表失败**
+   - 检查网络连接
+   - 验证URL是否可访问
+   - 检查curl是否安装
 
-3. **网络连接问题**
-   ```bash
-   # 检查网络连接
-   curl -I https://raw.githubusercontent.com/Travisun/Latest-Country-IP-List/refs/heads/main/data/cidr_lists/ae_ipv4.txt
-   ```
-
-4. **锁文件问题**
-   ```bash
-   # 删除锁文件（如果脚本异常退出）
-   sudo rm -f /var/run/ufw_cidr_blocker.lock
-   ```
+3. **systemd服务无法启动**
+   - 检查服务文件语法：`sudo systemctl status ufw_cidr_blocker.service`
+   - 查看服务日志：`sudo journalctl -u ufw_cidr_blocker.service`
 
 ### 调试模式
 
-启用调试模式获取更详细的信息：
+启用测试模式进行调试：
 
 ```bash
 # 编辑配置文件
 sudo nano /usr/local/bin/ufw_cidr_blocker.conf
 
-# 设置调试模式
-DEBUG_MODE=true
+# 启用测试模式
+TEST_MODE=true
+TEST_CIDR_LIMIT=5
+```
+
+### 查看UFW规则
+
+```bash
+# 查看所有规则
+sudo ufw status numbered
+
+# 查看自动生成的规则
+sudo ufw status numbered | grep "AUTO_BLOCK_CIDR"
 ```
 
 ## 安全注意事项
 
-1. **备份现有规则**: 在首次运行前备份现有UFW规则
+1. **备份现有规则**：安装前建议备份现有UFW规则
    ```bash
-   sudo ufw status numbered > ufw_backup.txt
+   sudo ufw status numbered > ufw_backup_$(date +%Y%m%d).txt
    ```
 
-2. **测试环境**: 建议先在测试环境中验证配置
+2. **测试网络连接**：首次运行后测试网络连接是否正常
 
-3. **监控影响**: 运行后监控网络连接是否正常
+3. **监控日志**：定期检查日志文件确保脚本正常运行
 
-4. **定期检查**: 定期检查日志确保脚本正常运行
-
-## 卸载
-
-如需卸载此工具：
-
-```bash
-# 删除脚本文件
-sudo rm -f /usr/local/bin/ufw_cidr_blocker
-
-# 删除配置文件
-sudo rm -f /usr/local/bin/ufw_cidr_blocker.conf
-
-# 删除日志文件
-sudo rm -f /var/log/ufw_cidr_blocker.log
-
-# 删除锁文件
-sudo rm -f /var/run/ufw_cidr_blocker.lock
-
-# 删除定时任务
-sudo crontab -e
-# 手动删除相关cron条目
-
-# 清理UFW规则（可选）
-sudo ufw status numbered | grep AUTO_BLOCK_CIDR | awk -F'[][]' '{print $2}' | sort -nr | xargs -I {} echo "y" | sudo ufw delete {}
-```
+4. **定期更新**：保持CIDR列表和脚本的更新
 
 ## 许可证
 
-本项目采用MIT许可证。
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
 
 ## 贡献
 
-欢迎提交Issue和Pull Request来改进这个项目。
+欢迎提交 Issue 和 Pull Request！
 
 ## 更新日志
 
 ### v1.0.0
 - 初始版本发布
 - 支持IPv4/IPv6 CIDR列表
-- 自动规则管理
-- 定时任务支持
-- 完整日志系统 
+- 集成UFW防火墙
+- 支持systemd定时器
+- 完整的安装/卸载脚本
+
+## 支持
+
+如果遇到问题，请：
+
+1. 查看本文档的故障排除部分
+2. 检查日志文件
+3. 提交 Issue 到 GitHub
+
+---
+
+**注意**：使用本工具前请确保了解其影响，建议在测试环境中先进行验证。 

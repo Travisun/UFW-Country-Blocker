@@ -197,6 +197,7 @@ add_new_rules() {
     local rule_count=0
     local cidr_count=0
     local processed_cidrs=0
+    local error_count=0
     
     log "添加新的防火墙规则..."
     log "配置文件中的端口: ${BLOCK_PORTS[*]}"
@@ -205,6 +206,10 @@ add_new_rules() {
     log "阻止IPv6 ICMP: $BLOCK_IPV6_ICMP"
     log "测试模式: $TEST_MODE"
     log "测试限制: $TEST_CIDR_LIMIT"
+    
+    # 检查UFW状态
+    log "当前UFW状态:"
+    ufw status | head -10
     
     while IFS= read -r line; do
         # 跳过空行和注释行
@@ -231,15 +236,30 @@ add_new_rules() {
         # 为每个端口和协议添加规则
         for port in "${BLOCK_PORTS[@]}"; do
             for proto in "${BLOCK_PROTOCOLS[@]}"; do
-                # UFW deny命令的正确语法
+                # 使用基本的UFW deny命令语法
                 local ufw_cmd="ufw deny from $cidr to any port $port proto $proto"
                 log "执行命令: $ufw_cmd"
                 
-                if eval "$ufw_cmd" > /dev/null 2>&1; then
+                # 捕获命令输出和错误
+                local output
+                local exit_code
+                output=$(eval "$ufw_cmd" 2>&1)
+                exit_code=$?
+                
+                if [ $exit_code -eq 0 ]; then
                     log "已添加规则: 阻止 $cidr $proto $port端口"
                     ((rule_count++))
                 else
-                    log "警告: 无法添加 $proto $port 规则: $cidr (可能已存在)"
+                    log "警告: 无法添加 $proto $port 规则: $cidr"
+                    log "错误输出: $output"
+                    log "退出代码: $exit_code"
+                    ((error_count++))
+                    
+                    # 如果错误太多，停止处理
+                    if [ $error_count -gt 10 ]; then
+                        log "错误太多，停止处理"
+                        break 2
+                    fi
                 fi
             done
         done
@@ -249,11 +269,19 @@ add_new_rules() {
             local ufw_cmd="ufw deny from $cidr to any proto icmp"
             log "执行ICMP命令: $ufw_cmd"
             
-            if eval "$ufw_cmd" > /dev/null 2>&1; then
+            local output
+            local exit_code
+            output=$(eval "$ufw_cmd" 2>&1)
+            exit_code=$?
+            
+            if [ $exit_code -eq 0 ]; then
                 log "已添加规则: 阻止 $cidr ICMP (ping)"
                 ((rule_count++))
             else
-                log "警告: 无法添加ICMP规则: $cidr (可能已存在)"
+                log "警告: 无法添加ICMP规则: $cidr"
+                log "错误输出: $output"
+                log "退出代码: $exit_code"
+                ((error_count++))
             fi
         fi
         
@@ -262,17 +290,25 @@ add_new_rules() {
             local ufw_cmd="ufw deny from $cidr to any proto ipv6-icmp"
             log "执行IPv6-ICMP命令: $ufw_cmd"
             
-            if eval "$ufw_cmd" > /dev/null 2>&1; then
+            local output
+            local exit_code
+            output=$(eval "$ufw_cmd" 2>&1)
+            exit_code=$?
+            
+            if [ $exit_code -eq 0 ]; then
                 log "已添加规则: 阻止 $cidr IPv6-ICMP (ping)"
                 ((rule_count++))
             else
-                log "警告: 无法添加IPv6-ICMP规则: $cidr (可能已存在)"
+                log "警告: 无法添加IPv6-ICMP规则: $cidr"
+                log "错误输出: $output"
+                log "退出代码: $exit_code"
+                ((error_count++))
             fi
         fi
         
-        # 每处理100个CIDR输出一次进度
-        if [ $((processed_cidrs % 100)) -eq 0 ]; then
-            log "进度: 已处理 $processed_cidrs 个CIDR，添加了 $rule_count 条规则"
+        # 每处理10个CIDR输出一次进度（减少频率以便调试）
+        if [ $((processed_cidrs % 10)) -eq 0 ]; then
+            log "进度: 已处理 $processed_cidrs 个CIDR，添加了 $rule_count 条规则，错误 $error_count 个"
         fi
         
         # 测试模式：限制处理的CIDR数量
@@ -281,9 +317,15 @@ add_new_rules() {
             break
         fi
         
+        # 如果错误太多，停止处理
+        if [ $error_count -gt 10 ]; then
+            log "错误太多，停止处理"
+            break
+        fi
+        
     done < "$cidr_file"
     
-    log "总共添加了 $rule_count 条新规则，处理了 $cidr_count 个有效CIDR，读取了 $processed_cidrs 行"
+    log "总共添加了 $rule_count 条新规则，处理了 $cidr_count 个有效CIDR，读取了 $processed_cidrs 行，错误 $error_count 个"
 }
 
 # 重载防火墙

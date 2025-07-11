@@ -1,0 +1,17 @@
+[Unit]
+Description=UFW CIDR Blocker Timer
+Documentation=https://github.com/your-repo/ufw-cidr-blocker
+Requires=ufw_cidr_blocker.service
+
+[Timer]
+# 每天凌晨2点运行
+OnCalendar=*-*-* 02:00:00
+# 系统启动后延迟5分钟运行
+OnBootSec=5min
+# 如果错过了执行时间，立即执行
+Persistent=true
+# 随机延迟，避免同时运行多个实例
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target 

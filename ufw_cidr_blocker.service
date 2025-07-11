@@ -1,0 +1,25 @@
+[Unit]
+Description=UFW CIDR Blocker Service
+Documentation=https://github.com/your-repo/ufw-cidr-blocker
+After=network.target ufw.service
+Wants=ufw.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ufw_cidr_blocker
+User=root
+Group=root
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=300
+TimeoutStopSec=30
+
+# 安全设置
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log /var/run /tmp
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target 
