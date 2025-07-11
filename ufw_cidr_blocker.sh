@@ -236,14 +236,14 @@ add_new_rules() {
         # 为每个端口和协议添加规则
         for port in "${BLOCK_PORTS[@]}"; do
             for proto in "${BLOCK_PROTOCOLS[@]}"; do
-                # 使用基本的UFW deny命令语法
+                # 使用正确的UFW deny命令语法
                 local ufw_cmd="ufw deny from $cidr to any port $port proto $proto"
                 log "执行命令: $ufw_cmd"
                 
                 # 捕获命令输出和错误
                 local output
                 local exit_code
-                output=$(eval "$ufw_cmd" 2>&1)
+                output=$(ufw deny from "$cidr" to any port "$port" proto "$proto" 2>&1)
                 exit_code=$?
                 
                 if [ $exit_code -eq 0 ]; then
@@ -271,7 +271,7 @@ add_new_rules() {
             
             local output
             local exit_code
-            output=$(eval "$ufw_cmd" 2>&1)
+            output=$(ufw deny from "$cidr" to any proto icmp 2>&1)
             exit_code=$?
             
             if [ $exit_code -eq 0 ]; then
@@ -292,7 +292,7 @@ add_new_rules() {
             
             local output
             local exit_code
-            output=$(eval "$ufw_cmd" 2>&1)
+            output=$(ufw deny from "$cidr" to any proto ipv6-icmp 2>&1)
             exit_code=$?
             
             if [ $exit_code -eq 0 ]; then
