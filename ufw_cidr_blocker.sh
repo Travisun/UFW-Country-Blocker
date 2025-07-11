@@ -203,6 +203,8 @@ add_new_rules() {
     log "配置文件中的协议: ${BLOCK_PROTOCOLS[*]}"
     log "阻止ICMP: $BLOCK_ICMP"
     log "阻止IPv6 ICMP: $BLOCK_IPV6_ICMP"
+    log "测试模式: $TEST_MODE"
+    log "测试限制: $TEST_CIDR_LIMIT"
     
     while IFS= read -r line; do
         # 跳过空行和注释行
@@ -224,12 +226,13 @@ add_new_rules() {
         local comment="${RULE_COMMENT_PREFIX}_$(date +%s)_${cidr_count}"
         ((cidr_count++))
         
-        log "处理CIDR $processed_cidrs: $cidr (注释: $comment)"
+        log "处理CIDR $processed_cidrs: $cidr"
         
         # 为每个端口和协议添加规则
         for port in "${BLOCK_PORTS[@]}"; do
             for proto in "${BLOCK_PROTOCOLS[@]}"; do
-                local ufw_cmd="ufw deny from $cidr to any port $port proto $proto comment $comment"
+                # UFW deny命令的正确语法
+                local ufw_cmd="ufw deny from $cidr to any port $port proto $proto"
                 log "执行命令: $ufw_cmd"
                 
                 if eval "$ufw_cmd" > /dev/null 2>&1; then
@@ -243,7 +246,7 @@ add_new_rules() {
         
         # 阻止ICMP (ping) - 仅对IPv4
         if [ "$BLOCK_ICMP" = true ] && ! echo "$cidr" | grep -q ":"; then
-            local ufw_cmd="ufw deny from $cidr to any proto icmp comment $comment"
+            local ufw_cmd="ufw deny from $cidr to any proto icmp"
             log "执行ICMP命令: $ufw_cmd"
             
             if eval "$ufw_cmd" > /dev/null 2>&1; then
@@ -256,7 +259,7 @@ add_new_rules() {
         
         # 阻止IPv6 ICMP (ping) - 仅对IPv6
         if [ "$BLOCK_IPV6_ICMP" = true ] && echo "$cidr" | grep -q ":"; then
-            local ufw_cmd="ufw deny from $cidr to any proto ipv6-icmp comment $comment"
+            local ufw_cmd="ufw deny from $cidr to any proto ipv6-icmp"
             log "执行IPv6-ICMP命令: $ufw_cmd"
             
             if eval "$ufw_cmd" > /dev/null 2>&1; then
