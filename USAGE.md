@@ -4,11 +4,12 @@
 
 ### 安装
 ```bash
-# 下载项目
-git clone https://github.com/your-repo/ufw-cidr-blocker.git
-cd ufw-cidr-blocker
+# GitHub一键安装（推荐）
+curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install_github.sh | sudo bash
 
-# 安装
+# 或本地安装
+git clone https://github.com/Travisun/UFW-Country-Blocker.git
+cd UFW-Country-Blocker
 sudo bash install.sh
 ```
 
@@ -26,6 +27,10 @@ sudo tail -f /var/log/ufw_cidr_blocker.log
 
 ### 卸载
 ```bash
+# GitHub卸载
+curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/uninstall_github.sh | sudo bash
+
+# 或本地卸载
 sudo bash uninstall.sh
 ```
 

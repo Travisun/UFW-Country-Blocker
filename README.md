@@ -22,12 +22,19 @@
 
 ## 快速安装
 
-### 方法一：使用安装脚本（推荐）
+### 方法一：GitHub一键安装（推荐）
+
+```bash
+# 从GitHub直接安装
+curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install_github.sh | sudo bash
+```
+
+### 方法二：本地安装
 
 ```bash
 # 下载项目
-git clone https://github.com/your-repo/ufw-cidr-blocker.git
-cd ufw-cidr-blocker
+git clone https://github.com/Travisun/UFW-Country-Blocker.git
+cd UFW-Country-Blocker
 
 # 运行安装脚本
 sudo bash install.sh
@@ -138,6 +145,10 @@ IPV4_URLS=(
 ### 使用卸载脚本（推荐）
 
 ```bash
+# GitHub卸载
+curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/uninstall_github.sh | sudo bash
+
+# 或本地卸载
 sudo bash uninstall.sh
 ```
 

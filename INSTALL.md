@@ -1,54 +1,61 @@
-# UFW Country Blocker - 安装指南
+# UFW CIDR Blocker 安装说明
 
-## 🚀 一键安装（推荐）
+## 快速安装
+
+### 方法一：GitHub一键安装（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/install_github.sh | sudo bash
 ```
 
-## 📋 系统要求
+### 方法二：本地安装
 
-- Ubuntu/Debian系统
+```bash
+# 下载项目
+git clone https://github.com/Travisun/UFW-Country-Blocker.git
+cd UFW-Country-Blocker
+
+# 安装
+sudo bash install.sh
+```
+
+## 系统要求
+
+- Linux系统（推荐Ubuntu/Debian）
+- UFW防火墙
+- curl工具
 - root权限
-- 网络连接
 
-## ⚡ 安装过程
+## 安装后配置
 
-一键安装脚本将自动完成以下步骤：
-
-1. ✅ 检查root权限
-2. ✅ 检查网络连接
-3. ✅ 安装系统依赖（UFW、curl、cron）
-4. ✅ 从GitHub下载最新文件
-5. ✅ 安装主程序到 `/usr/local/bin/`
-6. ✅ 创建日志文件
-7. ✅ 启用并配置UFW防火墙
-8. ✅ 设置每周星期一早上3点自动更新定时任务
-9. ✅ 测试脚本功能
-10. ✅ 显示使用说明
-
-## 🔧 安装后配置
-
-安装完成后，编辑配置文件：
-
+1. 编辑配置文件：
 ```bash
 sudo nano /usr/local/bin/ufw_cidr_blocker.conf
 ```
 
-## 📖 使用方法
-
+2. 手动运行一次：
 ```bash
-# 手动运行
-sudo ufw_cidr_blocker
-
-# 查看日志
-sudo tail -f /var/log/ufw_cidr_blocker.log
-
-# 查看UFW状态
-sudo ufw status numbered
+sudo /usr/local/bin/ufw_cidr_blocker
 ```
 
-## 🆘 需要帮助？
+3. 查看状态：
+```bash
+sudo systemctl status ufw_cidr_blocker.timer
+```
 
-- 查看完整文档：https://github.com/Travisun/UFW-Country-Blocker
-- 提交Issue：https://github.com/Travisun/UFW-Country-Blocker/issues 
+## 卸载
+
+```bash
+# GitHub卸载
+curl -fsSL https://raw.githubusercontent.com/Travisun/UFW-Country-Blocker/main/uninstall_github.sh | sudo bash
+
+# 或本地卸载
+sudo bash uninstall.sh
+```
+
+## 默认配置
+
+- 阻止目标：中国IP
+- 阻止端口：53 (DNS)
+- 阻止协议：TCP, UDP
+- 自动更新：每天凌晨2点 
