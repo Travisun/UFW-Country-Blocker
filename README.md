@@ -14,7 +14,7 @@ Fireset 是一个用于防火墙的 IP Set 管理工具，支持按国家自动�
 ## 安装
 
 ```bash
-sudo bash install.sh
+sudo curl -fsSL https://raw.githubusercontent.com/Travisun/fireset/refs/heads/main/install.sh | bash
 ```
 
 ## 配置
@@ -24,8 +24,8 @@ sudo bash install.sh
 ```bash
 declare -A COUNTRIES=(
     ["cn"]="China"
-    ["ru"]="Russia"
-    ["kr"]="South Korea"
+    # ["ru"]="Russia"
+    # ["kr"]="South Korea"
     # 在此添加更多国家
 )
 ```

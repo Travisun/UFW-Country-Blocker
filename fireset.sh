@@ -3,8 +3,8 @@
 # 配置国家和对应的 IP 列表 URL
 declare -A COUNTRIES=(
     ["cn"]="China"
-    ["ru"]="Russia"
-    ["kr"]="South Korea"
+    # ["ru"]="Russia"
+    # ["kr"]="South Korea"
     # 在此添加更多国家
 )
 
