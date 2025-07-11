@@ -89,9 +89,12 @@ setup_service() {
     systemctl enable fireset.timer || error "无法启用 fireset.timer"
     systemctl start fireset.timer || warn "无法启动 fireset.timer"
     
-    # 立即运行一次更新
-    log "执行首次 IP 集合更新..."
-    systemctl start fireset.service || warn "首次更新失败，请检查日志"
+    # 在后台启动首次更新
+    log "正在后台启动首次 IP 集合更新..."
+    systemctl start fireset.service &
+    log "首次更新已在后台启动，可以通过以下命令查看进度："
+    log "systemctl status fireset.service"
+    log "journalctl -u fireset.service -f"
 }
 
 # 清理临时文件
@@ -107,6 +110,9 @@ show_status() {
     systemctl status fireset.timer
     echo "下次运行时间："
     systemctl list-timers fireset.timer
+    log "提示：首次更新正在后台进行，可以使用以下命令查看进度："
+    log "systemctl status fireset.service"
+    log "journalctl -u fireset.service -f"
 }
 
 # 主安装流程
